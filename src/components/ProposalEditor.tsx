@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   DndContext,
   closestCenter,
@@ -22,7 +23,6 @@ import {
   GripVertical,
   Eye,
   EyeOff,
-  Send,
   Plus,
   FileText,
   List,
@@ -34,151 +34,31 @@ import {
   X,
   ImageIcon,
   Trash2,
+  Download,
+  Link2,
+  Undo2,
+  Redo2,
+  ArrowLeft,
 } from "lucide-react";
-
-// ─── Types ─────────────────────────────────────────────────────────
-
-type BlockType = "cover" | "scope" | "timeline" | "pricing" | "signature";
-
-interface CoverData {
-  title: string;
-  subtitle: string;
-  date: string;
-}
-
-interface ScopeData {
-  heading: string;
-  description: string;
-  items: string[];
-}
-
-interface TimelineTask {
-  name: string;
-  start: number;
-  duration: number;
-  color: string;
-}
-
-interface TimelineData {
-  heading: string;
-  description: string;
-  totalWeeks: number;
-  tasks: TimelineTask[];
-}
-
-interface PricingItem {
-  item: string;
-  description: string;
-  qty: number;
-  rate: number;
-  required: boolean;
-}
-
-interface PricingData {
-  heading: string;
-  description: string;
-  items: PricingItem[];
-}
-
-interface SignatureData {
-  heading: string;
-  description: string;
-  providerName: string;
-  providerDate: string;
-}
-
-type BlockData = CoverData | ScopeData | TimelineData | PricingData | SignatureData;
-
-interface Block {
-  id: string;
-  type: BlockType;
-  data: BlockData;
-}
-
-// ─── Default Data Factories ─────────────────────────────────────────
-
-function defaultCoverData(): CoverData {
-  return {
-    title: "Website Redesign Proposal",
-    subtitle: "Acme Corp",
-    date: "March 2026 \u00b7 Valid for 30 days",
-  };
-}
-
-function defaultScopeData(): ScopeData {
-  return {
-    heading: "Scope of Work",
-    description: "The following deliverables are included in this engagement. Each phase builds on the previous, ensuring alignment at every step.",
-    items: [
-      "Complete redesign of the marketing website with modern, responsive layouts",
-      "Custom CMS integration for self-service content management",
-      "Performance optimization targeting sub-2s load times on 3G",
-      "SEO audit and implementation of technical SEO best practices",
-      "Accessibility audit ensuring WCAG 2.1 AA compliance",
-      "Analytics setup with custom event tracking and conversion funnels",
-    ],
-  };
-}
-
-function defaultTimelineData(): TimelineData {
-  return {
-    heading: "Project Timeline",
-    description: "Estimated 10-week engagement from kickoff to launch.",
-    totalWeeks: 10,
-    tasks: [
-      { name: "Discovery & Research", start: 0, duration: 2, color: "#2D6A4F" },
-      { name: "Wireframes & IA", start: 1, duration: 2, color: "#245A42" },
-      { name: "Visual Design", start: 3, duration: 3, color: "#2D6A4F" },
-      { name: "Development", start: 4, duration: 4, color: "#1B5E3B" },
-      { name: "QA & Testing", start: 7, duration: 2, color: "#15803D" },
-      { name: "Launch & Handoff", start: 8, duration: 1, color: "#2D6A4F" },
-    ],
-  };
-}
-
-function defaultPricingData(): PricingData {
-  return {
-    heading: "Investment",
-    description: "Required items are included in every package. Optional add-ons can be toggled.",
-    items: [
-      { item: "Discovery & Strategy", description: "Stakeholder interviews, competitive analysis", qty: 1, rate: 3200, required: true },
-      { item: "UX Design", description: "Wireframes, user flows, prototype", qty: 1, rate: 5600, required: true },
-      { item: "Visual Design", description: "UI design for 12 page templates", qty: 12, rate: 480, required: true },
-      { item: "Development", description: "Frontend build with CMS integration", qty: 1, rate: 9800, required: true },
-      { item: "SEO Package", description: "Technical SEO + content optimization", qty: 1, rate: 2400, required: false },
-      { item: "Analytics Setup", description: "GA4 + custom dashboards", qty: 1, rate: 1800, required: false },
-    ],
-  };
-}
-
-function defaultSignatureData(): SignatureData {
-  return {
-    heading: "Acceptance & Signature",
-    description: "By signing below, you agree to the scope, timeline, and investment outlined in this proposal. This agreement is valid for 30 days from the date of issue.",
-    providerName: "Sam Designer",
-    providerDate: "March 15, 2026",
-  };
-}
-
-function createBlockData(type: BlockType): BlockData {
-  switch (type) {
-    case "cover": return defaultCoverData();
-    case "scope": return defaultScopeData();
-    case "timeline": return defaultTimelineData();
-    case "pricing": return defaultPricingData();
-    case "signature": return defaultSignatureData();
-  }
-}
-
-// ─── Initial State ────────────────────────────────────────────────
-
-const INITIAL_BLOCKS: Block[] = [
-  { id: "block-cover", type: "cover", data: defaultCoverData() },
-  { id: "block-scope", type: "scope", data: defaultScopeData() },
-  { id: "block-timeline", type: "timeline", data: defaultTimelineData() },
-  { id: "block-pricing", type: "pricing", data: defaultPricingData() },
-  { id: "block-signature", type: "signature", data: defaultSignatureData() },
-];
+import {
+  type Block,
+  type BlockType,
+  type BlockData,
+  type CoverData,
+  type ScopeData,
+  type TimelineData,
+  type TimelineTask,
+  type PricingData,
+  type PricingItem,
+  type SignatureData,
+  createBlockData,
+  createDefaultBlocks,
+  createProposal,
+  getProposal,
+  saveProposal,
+  encodeProposalForShare,
+  formatCurrency,
+} from "@/lib/proposals";
 
 const BLOCK_TYPE_OPTIONS: { type: BlockType; label: string; icon: typeof FileText }[] = [
   { type: "cover", label: "Cover Page", icon: ImageIcon },
@@ -187,17 +67,6 @@ const BLOCK_TYPE_OPTIONS: { type: BlockType; label: string; icon: typeof FileTex
   { type: "pricing", label: "Pricing Table", icon: Table },
   { type: "signature", label: "E-Signature", icon: PenTool },
 ];
-
-// ─── Formatting ────────────────────────────────────────────────────
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
 
 // ─── Shared Inline Input ──────────────────────────────────────────
 
@@ -1224,7 +1093,7 @@ function AddBlockDropdown({ onAdd }: { onAdd: (type: BlockType) => void }) {
 
       {open && (
         <div
-          className="absolute left-0 top-full z-50 mt-2 w-[220px] rounded-xl border bg-surface p-1.5 animate-fade-in-up"
+          className="absolute left-0 bottom-full z-50 mb-2 w-[220px] rounded-xl border bg-surface p-1.5 animate-fade-in-up"
           style={{ borderColor: "rgba(26,26,23,0.10)", boxShadow: "var(--shadow-lg)" }}
           role="menu"
         >
@@ -1261,10 +1130,13 @@ function PreviewPanel({
   const noop = () => {};
   return (
     <div className="flex flex-1 flex-col overflow-y-auto bg-surface-alt">
-      <div className="mx-auto w-full max-w-[680px] py-10">
-        <div className="space-y-0">
-          {blocks.map((block) => (
-            <div key={block.id} className="bg-surface border-b" style={{ borderColor: "rgba(26,26,23,0.06)" }}>
+      <div className="mx-auto w-full max-w-[760px] py-12 px-6">
+        <div
+          className="overflow-hidden rounded-2xl border bg-surface"
+          style={{ borderColor: "rgba(26,26,23,0.08)", boxShadow: "0 4px 32px rgba(26,26,23,0.06), 0 1px 4px rgba(26,26,23,0.04)" }}
+        >
+          {blocks.map((block, i) => (
+            <div key={block.id} className={`bg-surface ${i < blocks.length - 1 ? "border-b" : ""}`} style={{ borderColor: "rgba(26,26,23,0.06)" }}>
               {block.type === "cover" && <CoverBlock data={block.data as CoverData} editing={false} onChange={noop} proposalTitle="" clientName="" />}
               {block.type === "scope" && <ScopeBlock data={block.data as ScopeData} editing={false} onChange={noop} preview />}
               {block.type === "timeline" && <TimelineBlock data={block.data as TimelineData} editing={false} onChange={noop} preview />}
@@ -1280,17 +1152,124 @@ function PreviewPanel({
 
 // ─── Main Editor Component ─────────────────────────────────────────
 
-export function ProposalEditor() {
-  const [blocks, setBlocks] = useState<Block[]>(INITIAL_BLOCKS);
+interface EditorProps {
+  proposalId: string;
+}
+
+export function ProposalEditor({ proposalId }: EditorProps) {
+  const router = useRouter();
+  const [blocks, setBlocks] = useState<Block[]>(createDefaultBlocks());
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [livePreview, setLivePreview] = useState(false);
-  const [title, setTitle] = useState("Website Redesign Proposal");
-  const [client, setClient] = useState("Acme Corp");
-  const [pricingToggles, setPricingToggles] = useState<Record<number, boolean>>({ 4: false, 5: false });
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [title, setTitle] = useState("Untitled Proposal");
+  const [client, setClient] = useState("");
+  const [pricingToggles, setPricingToggles] = useState<Record<number, boolean>>({});
+  const [loaded, setLoaded] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  // Undo/redo history
+  const [history, setHistory] = useState<{ blocks: Block[]; title: string; client: string; pricingToggles: Record<number, boolean> }[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const isUndoRedo = useRef(false);
 
   const editorRef = useRef<HTMLDivElement>(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Load proposal from localStorage
+  useEffect(() => {
+    const p = getProposal(proposalId);
+    if (p) {
+      setTitle(p.title);
+      setClient(p.client);
+      setBlocks(p.blocks);
+      setPricingToggles(p.pricingToggles);
+      setHistory([{ blocks: p.blocks, title: p.title, client: p.client, pricingToggles: p.pricingToggles }]);
+      setHistoryIndex(0);
+    } else {
+      // Create new if doesn't exist
+      const newP = createProposal({ id: proposalId });
+      saveProposal(newP);
+      setTitle(newP.title);
+      setClient(newP.client);
+      setBlocks(newP.blocks);
+      setPricingToggles(newP.pricingToggles);
+      setHistory([{ blocks: newP.blocks, title: newP.title, client: newP.client, pricingToggles: newP.pricingToggles }]);
+      setHistoryIndex(0);
+    }
+    setLoaded(true);
+  }, [proposalId]);
+
+  // Auto-save to localStorage (debounced)
+  useEffect(() => {
+    if (!loaded) return;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      saveProposal({
+        id: proposalId,
+        title,
+        client,
+        blocks,
+        pricingToggles,
+        createdAt: getProposal(proposalId)?.createdAt ?? new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+    }, 500);
+    return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
+  }, [blocks, title, client, pricingToggles, loaded, proposalId]);
+
+  // Push to undo history
+  useEffect(() => {
+    if (!loaded || isUndoRedo.current) {
+      isUndoRedo.current = false;
+      return;
+    }
+    const snapshot = { blocks, title, client, pricingToggles };
+    setHistory((prev) => {
+      const trimmed = prev.slice(0, historyIndex + 1);
+      return [...trimmed, snapshot].slice(-50);
+    });
+    setHistoryIndex((prev) => Math.min(prev + 1, 49));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blocks, title, client, pricingToggles, loaded]);
+
+  const canUndo = historyIndex > 0;
+  const canRedo = historyIndex < history.length - 1;
+
+  const handleUndo = useCallback(() => {
+    if (!canUndo) return;
+    isUndoRedo.current = true;
+    const prev = history[historyIndex - 1];
+    setBlocks(prev.blocks);
+    setTitle(prev.title);
+    setClient(prev.client);
+    setPricingToggles(prev.pricingToggles);
+    setHistoryIndex((i) => i - 1);
+  }, [canUndo, history, historyIndex]);
+
+  const handleRedo = useCallback(() => {
+    if (!canRedo) return;
+    isUndoRedo.current = true;
+    const next = history[historyIndex + 1];
+    setBlocks(next.blocks);
+    setTitle(next.title);
+    setClient(next.client);
+    setPricingToggles(next.pricingToggles);
+    setHistoryIndex((i) => i + 1);
+  }, [canRedo, history, historyIndex]);
+
+  // Keyboard shortcuts: Ctrl+Z / Ctrl+Shift+Z
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "z") {
+        e.preventDefault();
+        if (e.shiftKey) handleRedo();
+        else handleUndo();
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleUndo, handleRedo]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -1327,14 +1306,26 @@ export function ProposalEditor() {
     setPricingToggles((prev) => ({ ...prev, [index]: !prev[index] }));
   }, []);
 
-  const handleSend = useCallback(() => {
-    setSending(true);
-    setTimeout(() => {
-      setSending(false);
-      setSent(true);
-      setTimeout(() => setSent(false), 2500);
-    }, 1500);
+  // PDF download
+  const handleDownloadPDF = useCallback(() => {
+    setLivePreview(true);
+    setTimeout(() => window.print(), 300);
   }, []);
+
+  // Share link
+  const handleShareLink = useCallback(() => {
+    const proposal = getProposal(proposalId);
+    if (!proposal) return;
+    // Save latest state first
+    saveProposal({ ...proposal, title, client, blocks, pricingToggles });
+    const encoded = encodeProposalForShare({ ...proposal, title, client, blocks, pricingToggles });
+    const url = `${window.location.origin}/share#${encoded}`;
+    setShareUrl(url);
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    });
+  }, [proposalId, title, client, blocks, pricingToggles]);
 
   // Click outside blocks to deselect
   useEffect(() => {
@@ -1346,6 +1337,16 @@ export function ProposalEditor() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Escape to close preview
+  useEffect(() => {
+    if (!livePreview) return;
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") setLivePreview(false);
+    }
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [livePreview]);
 
   const renderBlockContent = (block: Block) => {
     const isEditing = selectedBlockId === block.id;
@@ -1365,14 +1366,29 @@ export function ProposalEditor() {
     }
   };
 
+  if (!loaded) return null;
+
   return (
     <div className="flex h-full flex-col overflow-hidden">
       {/* ─── Top Toolbar ─── */}
       <header
-        className="flex shrink-0 items-center gap-4 border-b px-6 py-3 transition-colors duration-[150ms] ease-out"
+        className="flex shrink-0 items-center gap-3 border-b px-4 py-2.5 transition-colors duration-[150ms] ease-out print:hidden"
         style={{ borderColor: "rgba(26,26,23,0.10)", background: "var(--color-surface)" }}
       >
-        <div className="flex min-w-0 flex-1 items-center gap-4">
+        {/* Back */}
+        <button
+          type="button"
+          onClick={() => router.push("/proposals")}
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-surface-alt hover:text-text-primary"
+          aria-label="Back to proposals"
+        >
+          <ArrowLeft size={16} strokeWidth={2} />
+        </button>
+
+        <div className="h-5 w-px shrink-0" style={{ background: "rgba(26,26,23,0.10)" }} />
+
+        {/* Title + Client */}
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <form onSubmit={(e) => e.preventDefault()} className="flex min-w-0 items-center gap-3">
             <label htmlFor="proposal-title" className="sr-only">Proposal title</label>
             <input
@@ -1381,11 +1397,11 @@ export function ProposalEditor() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               spellCheck={false}
-              className="min-w-0 flex-1 truncate border-0 bg-transparent font-heading text-[20px] font-bold text-text-primary placeholder:text-text-muted/40 focus-visible:outline-none"
-              style={{ fontSize: "20px" }}
+              className="min-w-0 flex-1 truncate border-0 bg-transparent font-heading text-[18px] font-bold text-text-primary placeholder:text-text-muted/40 focus-visible:outline-none"
+              style={{ fontSize: "18px" }}
               placeholder="Proposal title"
             />
-            <span className="text-[14px] text-text-muted select-none" aria-hidden="true">for</span>
+            <span className="text-[13px] text-text-muted select-none" aria-hidden="true">for</span>
             <label htmlFor="client-name" className="sr-only">Client name</label>
             <input
               id="client-name"
@@ -1393,59 +1409,85 @@ export function ProposalEditor() {
               value={client}
               onChange={(e) => setClient(e.target.value)}
               spellCheck={false}
-              className="w-[140px] truncate rounded-md border bg-surface-alt px-2.5 py-1 text-[14px] font-medium text-text-primary placeholder:text-text-muted/40 transition-[box-shadow,border-color] duration-[120ms] ease-out focus-visible:border-accent focus-visible:outline-none"
+              className="w-[130px] truncate rounded-md border bg-surface-alt px-2 py-1 text-[13px] font-medium text-text-primary placeholder:text-text-muted/40 transition-[box-shadow,border-color] duration-[120ms] ease-out focus-visible:border-accent focus-visible:outline-none"
               style={{ borderColor: "rgba(26,26,23,0.10)", fontSize: "16px" }}
               placeholder="Client name"
             />
           </form>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            {livePreview ? (
-              <Eye size={16} strokeWidth={1.75} className="text-accent" aria-hidden="true" />
-            ) : (
-              <EyeOff size={16} strokeWidth={1.75} className="text-text-muted" aria-hidden="true" />
-            )}
-            <span className="text-[13px] font-medium text-text-secondary select-none">Preview</span>
-            <ToggleSwitch checked={livePreview} onChange={setLivePreview} ariaLabel="Toggle live preview" />
-          </div>
-
-          <div className="h-6 w-px" style={{ background: "rgba(26,26,23,0.10)" }} aria-hidden="true" />
-
+        {/* Undo / Redo */}
+        <div className="flex items-center gap-0.5">
           <button
             type="button"
-            onClick={handleSend}
-            disabled={sending || sent}
-            className="editor-send-btn inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-[14px] font-semibold text-on-accent shadow-sm select-none transition-[background-color,transform,opacity] duration-[120ms] ease-out cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
-            style={{ background: sent ? "var(--color-success)" : "var(--color-accent)" }}
+            onClick={handleUndo}
+            disabled={!canUndo}
+            className="flex h-8 w-8 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-surface-alt hover:text-text-primary disabled:opacity-30 disabled:pointer-events-none"
+            aria-label="Undo"
+            title="Undo (Ctrl+Z)"
           >
-            {sending ? (
-              <>
-                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-on-accent/30 border-t-on-accent" aria-hidden="true" />
-                Sending...
-              </>
-            ) : sent ? (
-              <>
-                <Check size={16} strokeWidth={2.5} aria-hidden="true" />
-                Sent
-              </>
-            ) : (
-              <>
-                <Send size={16} strokeWidth={2} aria-hidden="true" />
-                Send Proposal
-              </>
-            )}
+            <Undo2 size={15} strokeWidth={2} />
+          </button>
+          <button
+            type="button"
+            onClick={handleRedo}
+            disabled={!canRedo}
+            className="flex h-8 w-8 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-surface-alt hover:text-text-primary disabled:opacity-30 disabled:pointer-events-none"
+            aria-label="Redo"
+            title="Redo (Ctrl+Shift+Z)"
+          >
+            <Redo2 size={15} strokeWidth={2} />
           </button>
         </div>
+
+        <div className="h-5 w-px shrink-0" style={{ background: "rgba(26,26,23,0.10)" }} />
+
+        {/* Preview */}
+        <button
+          type="button"
+          onClick={() => setLivePreview(true)}
+          className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-medium text-text-secondary transition-colors hover:bg-surface-alt hover:text-text-primary"
+        >
+          <Eye size={15} strokeWidth={1.75} />
+          Preview
+        </button>
+
+        {/* PDF */}
+        <button
+          type="button"
+          onClick={handleDownloadPDF}
+          className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-medium text-text-secondary transition-colors hover:bg-surface-alt hover:text-text-primary"
+        >
+          <Download size={15} strokeWidth={1.75} />
+          PDF
+        </button>
+
+        {/* Share */}
+        <button
+          type="button"
+          onClick={handleShareLink}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-[13px] font-semibold text-on-accent shadow-sm transition-colors hover:bg-accent-hover"
+        >
+          {copied ? (
+            <>
+              <Check size={15} strokeWidth={2.5} />
+              Copied!
+            </>
+          ) : (
+            <>
+              <Link2 size={15} strokeWidth={2} />
+              Share Link
+            </>
+          )}
+        </button>
       </header>
 
       {/* ─── Body ─── */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden print:hidden">
         <div className="flex flex-1 flex-col overflow-y-auto dot-grid" style={{ minWidth: 0 }}>
           <div
             ref={editorRef}
-            className={`mx-auto w-full py-8 px-4 ${livePreview ? "max-w-[720px]" : "max-w-[800px]"}`}
+            className="mx-auto w-full max-w-[800px] py-8 px-4"
             style={{ paddingLeft: "56px", paddingRight: "56px" }}
           >
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -1472,24 +1514,49 @@ export function ProposalEditor() {
             </div>
           </div>
         </div>
+      </div>
 
-        {livePreview && (
-          <div className="flex w-[480px] shrink-0 flex-col border-l animate-fade-in-up overflow-hidden" style={{ borderColor: "rgba(26,26,23,0.10)" }}>
-            <div className="flex shrink-0 items-center justify-between border-b px-4 py-2.5" style={{ borderColor: "rgba(26,26,23,0.10)", background: "var(--color-surface)" }}>
-              <span className="text-[12px] font-semibold uppercase tracking-wide text-text-muted select-none">Client Preview</span>
+      {/* ─── Full-screen Preview Overlay ─── */}
+      {livePreview && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-surface-alt animate-fade-in-up print:static print:animate-none" style={{ animationDuration: "200ms" }}>
+          <header
+            className="flex shrink-0 items-center justify-between border-b px-6 py-3 print:hidden"
+            style={{ borderColor: "rgba(26,26,23,0.10)", background: "var(--color-surface)" }}
+          >
+            <div className="flex items-center gap-3">
+              <Eye size={16} strokeWidth={1.75} className="text-accent" aria-hidden="true" />
+              <span className="font-heading text-[16px] font-semibold text-text-primary select-none">
+                Client Preview
+              </span>
+              <span className="rounded-full bg-accent-subtle px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent-text select-none">
+                {title}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[13px] font-medium text-text-secondary transition-colors hover:bg-surface-alt"
+                style={{ borderColor: "rgba(26,26,23,0.10)" }}
+              >
+                <Download size={14} strokeWidth={2} />
+                Download PDF
+              </button>
               <button
                 type="button"
                 onClick={() => setLivePreview(false)}
-                aria-label="Close preview"
-                className="editor-close-btn flex h-7 w-7 items-center justify-center rounded-md text-text-muted transition-colors duration-[120ms] ease-out cursor-pointer select-none"
+                className="inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[13px] font-medium text-text-secondary transition-colors hover:bg-surface-alt"
+                style={{ borderColor: "rgba(26,26,23,0.10)" }}
               >
                 <X size={14} strokeWidth={2} />
+                Back to Editor
               </button>
             </div>
-            <PreviewPanel blocks={blocks} pricingToggles={pricingToggles} />
-          </div>
-        )}
-      </div>
+          </header>
+
+          <PreviewPanel blocks={blocks} pricingToggles={pricingToggles} />
+        </div>
+      )}
     </div>
   );
 }

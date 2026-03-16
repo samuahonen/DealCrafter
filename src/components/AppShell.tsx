@@ -2,12 +2,11 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { FileText, LayoutGrid, Kanban, Plus } from "lucide-react";
+import { FileText, LayoutGrid, Plus } from "lucide-react";
 
 const navItems = [
-  { href: "/proposals", label: "Proposals", icon: FileText },
+  { href: "/proposals", label: "My Proposals", icon: FileText },
   { href: "/templates", label: "Templates", icon: LayoutGrid },
-  { href: "/pipeline", label: "Pipeline", icon: Kanban },
 ] as const;
 
 interface AppShellProps {
@@ -23,9 +22,9 @@ export function AppShell({ children }: AppShellProps) {
       <aside className="flex w-[260px] shrink-0 flex-col border-r border-border bg-surface-alt">
         {/* Logo */}
         <div className="flex h-16 items-center px-6">
-          <span className="font-heading text-[20px] font-bold tracking-tight text-text-primary">
+          <Link href="/" className="font-heading text-[20px] font-bold tracking-tight text-text-primary">
             DealCraft
-          </span>
+          </Link>
         </div>
 
         {/* Navigation */}
@@ -68,7 +67,7 @@ export function AppShell({ children }: AppShellProps) {
 
         {/* Bottom section */}
         <div className="p-3">
-          <Link href="/proposals" className="block">
+          <Link href="/proposals/new" className="block">
             <button
               type="button"
               className="

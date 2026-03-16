@@ -224,6 +224,33 @@ button:active {
   }
 }
 
+/* ── Print styles ─────────────────────────────────────────────── */
+@media print {
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .print\:hidden { display: none !important; }
+  .print\:static { position: static !important; }
+  .print\:animate-none { animation: none !important; }
+  .print\:pb-0 { padding-bottom: 0 !important; }
+
+  /* Hide sidebar */
+  aside { display: none !important; }
+
+  /* Make main content full width */
+  main { margin: 0 !important; max-width: 100% !important; }
+
+  /* Remove shadows and borders in print */
+  .shadow-paper, .shadow-sm, .shadow-md, .shadow-lg { box-shadow: none !important; }
+
+  @page {
+    margin: 0.75in;
+    size: letter;
+  }
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
