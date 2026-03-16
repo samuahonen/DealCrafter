@@ -1,26 +1,241 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: #FAFAF8;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F4F4F0;
+  --color-border: rgba(26,26,23,0.10);
+  --color-border-strong: rgba(26,26,23,0.20);
+  --color-text-primary: #1A1A17;
+  --color-text-secondary: #5C5C56;
+  --color-text-muted: #6B6B64;
+  --color-accent: #2D6A4F;
+  --color-accent-hover: #245A42;
+  --color-accent-text: #1B5E3B;
+  --color-accent-subtle: rgba(45,106,79,0.08);
+  --color-accent-surface: rgba(45,106,79,0.04);
+  --color-on-accent: #FFFFFF;
+  --color-destructive: #DC2626;
+  --color-warning: #B45309;
+  --color-success: #15803D;
+  --color-dot-grid: rgba(26,26,23,0.06);
+
+  --color-stage-draft: #6B6B64;
+  --color-stage-sent: #2D6A4F;
+  --color-stage-viewed: #B45309;
+  --color-stage-signed: #15803D;
+  --color-stage-expired: #DC2626;
+
+  --shadow-sm: 0 1px 3px rgba(26,26,23,0.06), 0 1px 2px rgba(26,26,23,0.04);
+  --shadow-md: 0 4px 12px rgba(26,26,23,0.07), 0 1px 4px rgba(26,26,23,0.04);
+  --shadow-lg: 0 8px 24px rgba(26,26,23,0.08), 0 2px 8px rgba(26,26,23,0.04);
+  --shadow-paper: 0 1px 4px rgba(26,26,23,0.06), 0 8px 16px rgba(26,26,23,0.04), 0 0 0 1px rgba(26,26,23,0.03);
+
+  --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+}
+
+button {
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+/* Fade-in animation for page content */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 250ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* Stagger delays for nav items */
+.stagger-1 { animation-delay: 40ms; }
+.stagger-2 { animation-delay: 80ms; }
+.stagger-3 { animation-delay: 120ms; }
+.stagger-4 { animation-delay: 160ms; }
+.stagger-5 { animation-delay: 200ms; }
+
+/* Deal card hover lift */
+@media (hover: hover) {
+  .deal-card-wrapper:hover > div {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+}
+
+/* Focus ring pattern */
+.nav-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-accent);
+  border-radius: 8px;
+}
+
+/* Theme transition for containers */
+.theme-transition {
+  transition: background-color 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out;
+}
+
+/* Proposal editor interactive styles */
+@media (hover: hover) {
+  .editor-block-option:hover {
+    background: rgba(45,106,79,0.06);
+    color: var(--color-text-primary);
+  }
+  .editor-block-option:hover svg {
+    color: var(--color-accent);
+  }
+  .editor-add-block:hover {
+    background: rgba(45,106,79,0.04);
+    border-color: rgba(45,106,79,0.20);
+    color: var(--color-accent-text);
+  }
+  .editor-close-btn:hover {
+    background: rgba(26,26,23,0.06);
+    color: var(--color-text-primary);
+  }
+  .editor-send-btn:hover:not(:disabled) {
+    background: var(--color-accent-hover);
+  }
+  .editor-table-row:hover {
+    background: rgba(45,106,79,0.02);
+  }
+}
+
+/* Spin animation for loading states */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin {
+  animation: spin 0.8s linear infinite;
+}
+
+/* Focus ring for proposal inputs */
+.editor-input:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dotted grid pattern for editor */
+.dot-grid {
+  background-image: radial-gradient(circle, var(--color-dot-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ── Client Portal ── */
+
+/* Section entrance */
+.portal-section {
+  animation: fadeInUp 300ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* Timeline bar entrance */
+.timeline-bar {
+  animation: fadeInUp 250ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* Milestone card entrance */
+.milestone-card {
+  animation: fadeInUp 250ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* Comment panel slide-in */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.comment-panel-enter {
+  animation: slideInRight 250ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* Comment backdrop fade */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.comment-backdrop-enter {
+  animation: fadeIn 200ms ease-out both;
+}
+
+/* Comment message stagger */
+.comment-stagger {
+  animation: fadeInUp 200ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* Portal hover styles */
+@media (hover: hover) {
+  .portal-comment-btn:hover {
+    background-color: var(--color-accent-subtle);
+    color: var(--color-accent-text);
+  }
+  .portal-close-btn:hover {
+    background-color: rgba(26,26,23,0.06);
+    color: var(--color-text-primary);
+  }
+  .portal-decline-btn:hover {
+    background-color: var(--color-surface-alt);
+    color: var(--color-text-primary);
+  }
+  .portal-accept-btn:hover {
+    background-color: var(--color-accent-hover) !important;
+  }
+  .portal-send-btn:hover:not(:disabled) {
+    background-color: var(--color-accent-hover);
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(26,26,23,0.15);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(26,26,23,0.25);
 }
