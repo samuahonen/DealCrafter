@@ -144,9 +144,9 @@ function ToggleSwitch({
   size?: "default" | "small";
   ariaLabel: string;
 }) {
-  const w = size === "small" ? "w-[36px]" : "w-[44px]";
-  const h = size === "small" ? "h-[20px]" : "h-[24px]";
-  const dot = size === "small" ? "h-[16px] w-[16px]" : "h-[20px] w-[20px]";
+  const w = size === "small" ? "w-9" : "w-11";
+  const h = size === "small" ? "h-5" : "h-6";
+  const dot = size === "small" ? "h-4 w-4" : "h-5 w-5";
   const translate = size === "small" ? "translate-x-[16px]" : "translate-x-[20px]";
 
   return (
@@ -198,7 +198,7 @@ function CoverBlock({
         className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl"
         style={{ background: "rgba(45,106,79,0.08)" }}
       >
-        <span className="font-heading text-[28px] font-bold text-accent">
+        <span className="font-heading text-3xl font-bold text-accent">
           {clientName.charAt(0).toUpperCase() || "?"}
         </span>
       </div>
@@ -210,20 +210,20 @@ function CoverBlock({
             placeholder="Proposal title"
             className="font-heading font-bold text-text-primary text-center"
           />
-          <div className="mt-3 flex items-center justify-center gap-1 text-[16px] text-text-secondary">
+          <div className="mt-3 flex items-center justify-center gap-1 text-base text-text-secondary">
             Prepared for{" "}
             <InlineInput
               value={data.subtitle}
               onChange={(v) => onChange({ ...data, subtitle: v })}
               placeholder="Client name"
-              className="font-medium text-text-primary text-center w-auto inline-block max-w-[200px]"
+              className="font-medium text-text-primary text-center w-auto inline-block max-w-52"
             />
           </div>
           <InlineInput
             value={data.date}
             onChange={(v) => onChange({ ...data, date: v })}
             placeholder="Date info"
-            className="mt-1 text-[14px] text-text-muted text-center"
+            className="mt-1 text-sm text-text-muted text-center"
           />
         </>
       ) : (
@@ -234,10 +234,10 @@ function CoverBlock({
           >
             {data.title || proposalTitle}
           </h2>
-          <p className="mt-3 text-[16px] text-text-secondary">
+          <p className="mt-3 text-base text-text-secondary">
             Prepared for <span className="font-medium text-text-primary">{data.subtitle || clientName}</span>
           </p>
-          <p className="mt-1 text-[14px] text-text-muted">{data.date}</p>
+          <p className="mt-1 text-sm text-text-muted">{data.date}</p>
         </>
       )}
     </div>
@@ -270,10 +270,10 @@ function ScopeBlock({
           value={data.heading}
           onChange={(v) => onChange({ ...data, heading: v })}
           placeholder="Section heading"
-          className="font-heading text-[20px] font-semibold text-text-primary"
+          className="font-heading text-xl font-semibold text-text-primary"
         />
       ) : (
-        <h3 className={`font-heading font-semibold text-text-primary ${preview ? "text-[clamp(22px,3vw,28px)]" : "text-[20px]"}`}>
+        <h3 className={`font-heading font-semibold text-text-primary ${preview ? "text-[clamp(22px,3vw,28px)]" : "text-xl"}`}>
           {data.heading}
         </h3>
       )}
@@ -284,25 +284,25 @@ function ScopeBlock({
           onChange={(v) => onChange({ ...data, description: v })}
           placeholder="Section description"
           multiline
-          className="mt-2 text-[14px] leading-relaxed text-text-secondary"
+          className="mt-2 text-sm leading-relaxed text-text-secondary"
         />
       ) : (
-        <p className="mt-2 text-[14px] leading-relaxed text-text-secondary" style={{ maxWidth: "65ch" }}>
+        <p className="mt-2 text-sm leading-relaxed text-text-secondary" style={{ maxWidth: "65ch" }}>
           {data.description}
         </p>
       )}
 
       <ul className="mt-4 space-y-2">
         {data.items.map((item, i) => (
-          <li key={i} className="flex items-start gap-3 text-[15px] leading-relaxed text-text-primary">
-            <span className="mt-[7px] block h-[6px] w-[6px] shrink-0 rounded-full bg-accent" aria-hidden="true" />
+          <li key={i} className="flex items-start gap-3 text-base leading-relaxed text-text-primary">
+            <span className="mt-[7px] block h-1.5 w-[6px] shrink-0 rounded-full bg-accent" aria-hidden="true" />
             {editing ? (
               <div className="flex flex-1 items-start gap-1">
                 <InlineInput
                   value={item}
                   onChange={(v) => updateItem(i, v)}
                   placeholder="Deliverable item"
-                  className="flex-1 text-[15px]"
+                  className="flex-1 text-base"
                 />
                 <button
                   type="button"
@@ -324,7 +324,7 @@ function ScopeBlock({
         <button
           type="button"
           onClick={addItem}
-          className="mt-3 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium text-accent-text transition-colors hover:bg-accent-subtle"
+          className="mt-3 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-accent-text transition-colors hover:bg-accent-subtle"
         >
           <Plus size={14} strokeWidth={2} />
           Add item
@@ -407,10 +407,10 @@ function TimelineBlock({
           value={data.heading}
           onChange={(v) => onChange({ ...data, heading: v })}
           placeholder="Section heading"
-          className="font-heading text-[20px] font-semibold text-text-primary"
+          className="font-heading text-xl font-semibold text-text-primary"
         />
       ) : (
-        <h3 className={`font-heading font-semibold text-text-primary ${preview ? "text-[clamp(22px,3vw,28px)]" : "text-[20px]"}`}>
+        <h3 className={`font-heading font-semibold text-text-primary ${preview ? "text-[clamp(22px,3vw,28px)]" : "text-xl"}`}>
           {data.heading}
         </h3>
       )}
@@ -421,7 +421,7 @@ function TimelineBlock({
             value={data.description}
             onChange={(v) => onChange({ ...data, description: v })}
             placeholder="Description"
-            className="flex-1 text-[14px] text-text-secondary"
+            className="flex-1 text-sm text-text-secondary"
           />
           <div className="flex shrink-0 items-center gap-1 rounded-lg border px-2 py-1" style={{ borderColor: "rgba(26,26,23,0.10)" }}>
             <button
@@ -429,9 +429,9 @@ function TimelineBlock({
               onClick={() => data.totalWeeks > 1 && onChange({ ...data, totalWeeks: data.totalWeeks - 1 })}
               className="flex h-5 w-5 items-center justify-center rounded text-text-muted transition-colors hover:bg-accent-subtle hover:text-accent-text"
             >
-              <span className="text-[14px] font-medium leading-none">&minus;</span>
+              <span className="text-sm font-medium leading-none">&minus;</span>
             </button>
-            <span className="min-w-[48px] text-center text-[12px] font-medium text-text-primary select-none">
+            <span className="min-w-12 text-center text-xs font-medium text-text-primary select-none">
               {data.totalWeeks} wks
             </span>
             <button
@@ -444,7 +444,7 @@ function TimelineBlock({
           </div>
         </div>
       ) : (
-        <p className="mt-2 text-[14px] text-text-secondary">{data.description}</p>
+        <p className="mt-2 text-sm text-text-secondary">{data.description}</p>
       )}
 
       {editing && (
@@ -452,7 +452,7 @@ function TimelineBlock({
           className="mt-3 flex items-center gap-2 rounded-lg px-3 py-2"
           style={{ background: "rgba(45,106,79,0.03)", border: "1px dashed rgba(45,106,79,0.15)" }}
         >
-          <span className="text-[11px] font-medium text-accent-text select-none">
+          <span className="text-xs font-medium text-accent-text select-none">
             Click and drag on the grid to set each phase's duration.
           </span>
         </div>
@@ -462,15 +462,15 @@ function TimelineBlock({
         <div style={{ minWidth: "540px" }}>
           {/* Week headers */}
           <div className="flex items-center">
-            <div className="w-[160px] shrink-0" />
+            <div className="w-40 shrink-0" />
             <div className="flex flex-1">
               {weeks.map((w) => (
-                <div key={w} className="flex-1 text-center text-[11px] font-medium uppercase tracking-wide text-text-muted">
+                <div key={w} className="flex-1 text-center text-xs font-medium uppercase tracking-wide text-text-muted">
                   W{w + 1}
                 </div>
               ))}
             </div>
-            {editing && <div className="w-[30px] shrink-0" />}
+            {editing && <div className="w-8 shrink-0" />}
           </div>
 
           {/* Task rows */}
@@ -484,16 +484,16 @@ function TimelineBlock({
                   style={{ background: isActive ? "rgba(45,106,79,0.04)" : undefined }}
                   onClick={() => editing && setActiveRow(i)}
                 >
-                  <div className="w-[160px] shrink-0 pr-3 py-1">
+                  <div className="w-40 shrink-0 pr-3 py-1">
                     {editing ? (
                       <InlineInput
                         value={task.name}
                         onChange={(v) => updateTask(i, { name: v })}
                         placeholder="Phase name"
-                        className="text-[13px] font-medium text-text-primary"
+                        className="text-xs font-medium text-text-primary"
                       />
                     ) : (
-                      <span className="text-[13px] font-medium text-text-primary">{task.name}</span>
+                      <span className="text-xs font-medium text-text-primary">{task.name}</span>
                     )}
                   </div>
                   <div className="relative flex flex-1">
@@ -510,7 +510,7 @@ function TimelineBlock({
                             height: "36px",
                             position: "relative",
                           }}
-                          onMouseDown={() => handleCellMouseDown(i, w)}
+                          onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); handleCellMouseDown(i, w); }}
                           onMouseEnter={() => handleCellMouseEnter(i, w)}
                         >
                           {isInBar && (
@@ -534,7 +534,7 @@ function TimelineBlock({
                     })}
                   </div>
                   {editing && (
-                    <div className="flex w-[30px] shrink-0 justify-center">
+                    <div className="flex w-8 shrink-0 justify-center">
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); removeTask(i); }}
@@ -556,7 +556,7 @@ function TimelineBlock({
               className="mt-2 flex items-center gap-3 rounded-lg border px-3 py-2 animate-fade-in-up"
               style={{ borderColor: "rgba(26,26,23,0.08)", background: "var(--color-surface)" }}
             >
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-text-muted select-none">
+              <span className="text-xs font-semibold uppercase tracking-wide text-text-muted select-none">
                 {data.tasks[activeRow].name}
               </span>
               <div className="h-3 w-px" style={{ background: "rgba(26,26,23,0.10)" }} />
@@ -579,7 +579,7 @@ function TimelineBlock({
                 ))}
               </div>
               <div className="h-3 w-px" style={{ background: "rgba(26,26,23,0.10)" }} />
-              <span className="text-[11px] text-text-muted select-none">
+              <span className="text-xs text-text-muted select-none">
                 W{data.tasks[activeRow].start + 1} &ndash; W{data.tasks[activeRow].start + data.tasks[activeRow].duration}
                 <span className="ml-1 text-text-muted/60">({data.tasks[activeRow].duration}w)</span>
               </span>
@@ -590,7 +590,7 @@ function TimelineBlock({
             <button
               type="button"
               onClick={addTask}
-              className="mt-3 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium text-accent-text transition-colors hover:bg-accent-subtle"
+              className="mt-3 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-accent-text transition-colors hover:bg-accent-subtle"
             >
               <Plus size={14} strokeWidth={2} />
               Add phase
@@ -644,10 +644,10 @@ function PricingBlock({
           value={data.heading}
           onChange={(v) => onChange({ ...data, heading: v })}
           placeholder="Section heading"
-          className="font-heading text-[20px] font-semibold text-text-primary"
+          className="font-heading text-xl font-semibold text-text-primary"
         />
       ) : (
-        <h3 className={`font-heading font-semibold text-text-primary ${preview ? "text-[clamp(22px,3vw,28px)]" : "text-[20px]"}`}>
+        <h3 className={`font-heading font-semibold text-text-primary ${preview ? "text-[clamp(22px,3vw,28px)]" : "text-xl"}`}>
           {data.heading}
         </h3>
       )}
@@ -657,17 +657,17 @@ function PricingBlock({
           value={data.description}
           onChange={(v) => onChange({ ...data, description: v })}
           placeholder="Description"
-          className="mt-2 text-[14px] text-text-secondary"
+          className="mt-2 text-sm text-text-secondary"
         />
       ) : (
-        <p className="mt-2 text-[14px] text-text-secondary">{data.description}</p>
+        <p className="mt-2 text-sm text-text-secondary">{data.description}</p>
       )}
 
       <div className="mt-5 overflow-x-auto">
         <table className="w-full text-left" style={{ minWidth: "520px" }}>
           <thead>
             <tr
-              className="border-b text-[11px] font-semibold uppercase tracking-wide text-text-muted"
+              className="border-b text-xs font-semibold uppercase tracking-wide text-text-muted"
               style={{ borderColor: "rgba(26,26,23,0.10)" }}
             >
               <th className="pb-2.5 pr-3">Item</th>
@@ -688,27 +688,27 @@ function PricingBlock({
                   className="editor-table-row border-b transition-colors duration-[120ms] ease-out"
                   style={{ borderColor: "rgba(26,26,23,0.06)", opacity: included ? 1 : 0.5 }}
                 >
-                  <td className="py-3 pr-3 text-[14px] font-medium text-text-primary">
+                  <td className="py-3 pr-3 text-sm font-medium text-text-primary">
                     {editing ? (
-                      <InlineInput value={row.item} onChange={(v) => updateRow(i, { item: v })} placeholder="Line item" className="text-[14px] font-medium" />
+                      <InlineInput value={row.item} onChange={(v) => updateRow(i, { item: v })} placeholder="Line item" className="text-sm font-medium" />
                     ) : row.item}
                   </td>
-                  <td className="py-3 pr-3 text-[13px] text-text-secondary hidden sm:table-cell">
+                  <td className="py-3 pr-3 text-xs text-text-secondary hidden sm:table-cell">
                     {editing ? (
-                      <InlineInput value={row.description} onChange={(v) => updateRow(i, { description: v })} placeholder="Description" className="text-[13px] text-text-secondary" />
+                      <InlineInput value={row.description} onChange={(v) => updateRow(i, { description: v })} placeholder="Description" className="text-xs text-text-secondary" />
                     ) : row.description}
                   </td>
-                  <td className="py-3 pr-3 text-right text-[14px] text-text-primary" style={{ fontVariantNumeric: "tabular-nums" }}>
+                  <td className="py-3 pr-3 text-right text-sm text-text-primary" style={{ fontVariantNumeric: "tabular-nums" }}>
                     {editing ? (
-                      <InlineNumber value={row.qty} onChange={(v) => updateRow(i, { qty: v })} min={1} className="text-[14px]" />
+                      <InlineNumber value={row.qty} onChange={(v) => updateRow(i, { qty: v })} min={1} className="text-sm" />
                     ) : row.qty}
                   </td>
-                  <td className="py-3 pr-3 text-right text-[14px] text-text-secondary" style={{ fontVariantNumeric: "tabular-nums" }}>
+                  <td className="py-3 pr-3 text-right text-sm text-text-secondary" style={{ fontVariantNumeric: "tabular-nums" }}>
                     {editing ? (
-                      <InlineNumber value={row.rate} onChange={(v) => updateRow(i, { rate: v })} className="text-[14px]" />
+                      <InlineNumber value={row.rate} onChange={(v) => updateRow(i, { rate: v })} className="text-sm" />
                     ) : formatCurrency(row.rate)}
                   </td>
-                  <td className="py-3 pr-3 text-right text-[14px] font-medium text-text-primary" style={{ fontVariantNumeric: "tabular-nums" }}>
+                  <td className="py-3 pr-3 text-right text-sm font-medium text-text-primary" style={{ fontVariantNumeric: "tabular-nums" }}>
                     {formatCurrency(row.qty * row.rate)}
                   </td>
                   <td className="py-3 text-center">
@@ -720,12 +720,12 @@ function PricingBlock({
                         ariaLabel={`Mark ${row.item} as required`}
                       />
                     ) : row.required ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-accent-subtle px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent-text">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-accent-subtle px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-accent-text">
                         <Check size={12} strokeWidth={2.5} aria-hidden="true" />
                         Req
                       </span>
                     ) : preview ? (
-                      <span className={`inline-block text-[12px] font-medium ${pricingToggles[i] ? "text-accent" : "text-text-muted"}`}>
+                      <span className={`inline-block text-xs font-medium ${pricingToggles[i] ? "text-accent" : "text-text-muted"}`}>
                         {pricingToggles[i] ? "Included" : "Optional"}
                       </span>
                     ) : (
@@ -760,7 +760,7 @@ function PricingBlock({
         <button
           type="button"
           onClick={addRow}
-          className="mt-3 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium text-accent-text transition-colors hover:bg-accent-subtle"
+          className="mt-3 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-accent-text transition-colors hover:bg-accent-subtle"
         >
           <Plus size={14} strokeWidth={2} />
           Add line item
@@ -770,22 +770,22 @@ function PricingBlock({
       {/* Totals */}
       <div className="mt-4 flex flex-col items-end gap-1 border-t pt-4" style={{ borderColor: "rgba(26,26,23,0.10)" }}>
         <div className="flex items-center gap-4">
-          <span className="text-[13px] text-text-secondary">Subtotal (required)</span>
-          <span className="text-[14px] font-medium text-text-primary" style={{ fontVariantNumeric: "tabular-nums" }}>
+          <span className="text-xs text-text-secondary">Subtotal (required)</span>
+          <span className="text-sm font-medium text-text-primary" style={{ fontVariantNumeric: "tabular-nums" }}>
             {formatCurrency(requiredTotal)}
           </span>
         </div>
         {optionalTotal > 0 && (
           <div className="flex items-center gap-4">
-            <span className="text-[13px] text-text-secondary">Add-ons</span>
-            <span className="text-[14px] font-medium text-text-primary" style={{ fontVariantNumeric: "tabular-nums" }}>
+            <span className="text-xs text-text-secondary">Add-ons</span>
+            <span className="text-sm font-medium text-text-primary" style={{ fontVariantNumeric: "tabular-nums" }}>
               +{formatCurrency(optionalTotal)}
             </span>
           </div>
         )}
         <div className="mt-1 flex items-center gap-4">
-          <span className="text-[14px] font-semibold text-text-primary">Total</span>
-          <span className="text-[20px] font-bold text-accent" style={{ fontVariantNumeric: "tabular-nums", fontFamily: "var(--font-heading)" }}>
+          <span className="text-sm font-semibold text-text-primary">Total</span>
+          <span className="text-xl font-bold text-accent" style={{ fontVariantNumeric: "tabular-nums", fontFamily: "var(--font-heading)" }}>
             {formatCurrency(total)}
           </span>
         </div>
@@ -812,10 +812,10 @@ function SignatureBlock({
           value={data.heading}
           onChange={(v) => onChange({ ...data, heading: v })}
           placeholder="Section heading"
-          className="font-heading text-[20px] font-semibold text-text-primary"
+          className="font-heading text-xl font-semibold text-text-primary"
         />
       ) : (
-        <h3 className={`font-heading font-semibold text-text-primary ${preview ? "text-[clamp(22px,3vw,28px)]" : "text-[20px]"}`}>
+        <h3 className={`font-heading font-semibold text-text-primary ${preview ? "text-[clamp(22px,3vw,28px)]" : "text-xl"}`}>
           {data.heading}
         </h3>
       )}
@@ -826,10 +826,10 @@ function SignatureBlock({
           onChange={(v) => onChange({ ...data, description: v })}
           placeholder="Description"
           multiline
-          className="mt-2 text-[14px] leading-relaxed text-text-secondary"
+          className="mt-2 text-sm leading-relaxed text-text-secondary"
         />
       ) : (
-        <p className="mt-2 text-[14px] leading-relaxed text-text-secondary" style={{ maxWidth: "65ch" }}>
+        <p className="mt-2 text-sm leading-relaxed text-text-secondary" style={{ maxWidth: "65ch" }}>
           {data.description}
         </p>
       )}
@@ -837,31 +837,31 @@ function SignatureBlock({
       <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
         {/* Client signature */}
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">Client Signature</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">Client Signature</p>
           <div
             className="mt-2 flex h-[80px] items-end rounded-lg border-b-2 px-4 pb-3"
             style={{ borderColor: "rgba(26,26,23,0.20)", background: "rgba(45,106,79,0.02)" }}
           >
-            <span className="text-[14px] italic text-text-muted">Sign here</span>
+            <span className="text-sm italic text-text-muted">Sign here</span>
           </div>
           <form onSubmit={(e) => e.preventDefault()} className="mt-3 space-y-2">
             <div>
-              <label htmlFor="sig-name" className="block text-[12px] font-medium text-text-muted">Full Name</label>
+              <label htmlFor="sig-name" className="block text-xs font-medium text-text-muted">Full Name</label>
               <input
                 id="sig-name"
                 type="text"
                 placeholder="Jane Smith"
                 spellCheck={false}
-                className="editor-input mt-1 w-full rounded-lg border bg-surface-alt px-3 py-2 text-[14px] text-text-primary placeholder:text-text-muted/50 transition-[box-shadow,border-color] duration-[120ms] ease-out"
+                className="editor-input mt-1 w-full rounded-lg border bg-surface-alt px-3 py-2 text-sm text-text-primary placeholder:text-text-muted/50 transition-[box-shadow,border-color] duration-[120ms] ease-out"
                 style={{ borderColor: "rgba(26,26,23,0.10)", fontSize: "16px" }}
               />
             </div>
             <div>
-              <label htmlFor="sig-date" className="block text-[12px] font-medium text-text-muted">Date</label>
+              <label htmlFor="sig-date" className="block text-xs font-medium text-text-muted">Date</label>
               <input
                 id="sig-date"
                 type="date"
-                className="editor-input mt-1 w-full rounded-lg border bg-surface-alt px-3 py-2 text-[14px] text-text-primary transition-[box-shadow,border-color] duration-[120ms] ease-out"
+                className="editor-input mt-1 w-full rounded-lg border bg-surface-alt px-3 py-2 text-sm text-text-primary transition-[box-shadow,border-color] duration-[120ms] ease-out"
                 style={{ borderColor: "rgba(26,26,23,0.10)", fontSize: "16px" }}
               />
             </div>
@@ -870,40 +870,40 @@ function SignatureBlock({
 
         {/* Provider signature */}
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">Provider Signature</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">Provider Signature</p>
           <div
             className="mt-2 flex h-[80px] items-end rounded-lg border-b-2 px-4 pb-3"
             style={{ borderColor: "rgba(26,26,23,0.20)", background: "rgba(45,106,79,0.02)" }}
           >
-            <span className="text-[22px] text-accent" style={{ fontFamily: "var(--font-heading)", fontStyle: "italic" }}>
+            <span className="text-2xl text-accent" style={{ fontFamily: "var(--font-heading)", fontStyle: "italic" }}>
               {data.providerName.split(" ").map((n) => n.charAt(0)).join("") + "."}
             </span>
           </div>
           <div className="mt-3 space-y-2">
             <div>
-              <p className="text-[12px] font-medium text-text-muted">Full Name</p>
+              <p className="text-xs font-medium text-text-muted">Full Name</p>
               {editing ? (
                 <InlineInput
                   value={data.providerName}
                   onChange={(v) => onChange({ ...data, providerName: v })}
                   placeholder="Your name"
-                  className="mt-1 text-[14px] text-text-primary"
+                  className="mt-1 text-sm text-text-primary"
                 />
               ) : (
-                <p className="mt-1 text-[14px] text-text-primary">{data.providerName}</p>
+                <p className="mt-1 text-sm text-text-primary">{data.providerName}</p>
               )}
             </div>
             <div>
-              <p className="text-[12px] font-medium text-text-muted">Date</p>
+              <p className="text-xs font-medium text-text-muted">Date</p>
               {editing ? (
                 <InlineInput
                   value={data.providerDate}
                   onChange={(v) => onChange({ ...data, providerDate: v })}
                   placeholder="Date"
-                  className="mt-1 text-[14px] text-text-primary"
+                  className="mt-1 text-sm text-text-primary"
                 />
               ) : (
-                <p className="mt-1 text-[14px] text-text-primary">{data.providerDate}</p>
+                <p className="mt-1 text-sm text-text-primary">{data.providerDate}</p>
               )}
             </div>
           </div>
@@ -1012,7 +1012,7 @@ function SortableBlock({
             style={{ borderColor: "rgba(26,26,23,0.06)", background: "rgba(45,106,79,0.03)" }}
           >
             <PenTool size={12} strokeWidth={2} className="text-accent" />
-            <span className="text-[11px] font-semibold uppercase tracking-wide text-accent-text select-none">
+            <span className="text-xs font-semibold uppercase tracking-wide text-accent-text select-none">
               Editing {block.type === "cover" ? "Cover Page" : block.type === "scope" ? "Scope" : block.type === "timeline" ? "Timeline" : block.type === "pricing" ? "Pricing" : "Signature"}
             </span>
           </div>
@@ -1052,7 +1052,7 @@ function AddBlockDropdown({ onAdd }: { onAdd: (type: BlockType) => void }) {
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-haspopup="true"
-        className="editor-add-block inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[120ms] ease-out cursor-pointer select-none"
+        className="editor-add-block inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-xs font-medium text-text-secondary transition-colors duration-[120ms] ease-out cursor-pointer select-none"
         style={{ borderColor: "rgba(26,26,23,0.10)", background: open ? "rgba(45,106,79,0.04)" : "var(--color-surface)" }}
       >
         <Plus size={16} strokeWidth={2} aria-hidden="true" />
@@ -1062,7 +1062,7 @@ function AddBlockDropdown({ onAdd }: { onAdd: (type: BlockType) => void }) {
 
       {open && (
         <div
-          className="absolute left-0 bottom-full z-50 mb-2 w-[220px] rounded-xl border bg-surface p-1.5 animate-fade-in-up"
+          className="absolute left-0 bottom-full z-50 mb-2 w-56 rounded-xl border bg-surface p-1.5 animate-fade-in-up"
           style={{ borderColor: "rgba(26,26,23,0.10)", boxShadow: "var(--shadow-lg)" }}
           role="menu"
         >
@@ -1074,7 +1074,7 @@ function AddBlockDropdown({ onAdd }: { onAdd: (type: BlockType) => void }) {
                 type="button"
                 role="menuitem"
                 onClick={() => { onAdd(opt.type); setOpen(false); }}
-                className="editor-block-option flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[120ms] ease-out cursor-pointer select-none"
+                className="editor-block-option flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-medium text-text-secondary transition-colors duration-[120ms] ease-out cursor-pointer select-none"
               >
                 <Icon size={16} strokeWidth={1.75} aria-hidden="true" className="text-text-muted" />
                 {opt.label}
@@ -1099,7 +1099,7 @@ function PreviewPanel({
   const noop = () => {};
   return (
     <div className="flex flex-1 flex-col overflow-y-auto bg-surface-alt">
-      <div className="mx-auto w-full max-w-[760px] py-12 px-6">
+      <div className="mx-auto w-full max-w-3xl py-12 px-6">
         <div
           className="overflow-hidden rounded-2xl border bg-surface"
           style={{ borderColor: "rgba(26,26,23,0.08)", boxShadow: "0 4px 32px rgba(26,26,23,0.06), 0 1px 4px rgba(26,26,23,0.04)" }}
@@ -1366,11 +1366,11 @@ export function ProposalEditor({ proposalId }: EditorProps) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               spellCheck={false}
-              className="min-w-0 flex-1 truncate border-0 bg-transparent font-heading text-[18px] font-bold text-text-primary placeholder:text-text-muted/40 focus-visible:outline-none"
+              className="min-w-0 flex-1 truncate border-0 bg-transparent font-heading text-lg font-bold text-text-primary placeholder:text-text-muted/40 focus-visible:outline-none"
               style={{ fontSize: "18px" }}
               placeholder="Proposal title"
             />
-            <span className="text-[13px] text-text-muted select-none" aria-hidden="true">for</span>
+            <span className="text-xs text-text-muted select-none" aria-hidden="true">for</span>
             <label htmlFor="client-name" className="sr-only">Client name</label>
             <input
               id="client-name"
@@ -1378,7 +1378,7 @@ export function ProposalEditor({ proposalId }: EditorProps) {
               value={client}
               onChange={(e) => setClient(e.target.value)}
               spellCheck={false}
-              className="w-[130px] truncate rounded-md border bg-surface-alt px-2 py-1 text-[13px] font-medium text-text-primary placeholder:text-text-muted/40 transition-[box-shadow,border-color] duration-[120ms] ease-out focus-visible:border-accent focus-visible:outline-none"
+              className="w-32 truncate rounded-md border bg-surface-alt px-2 py-1 text-xs font-medium text-text-primary placeholder:text-text-muted/40 transition-[box-shadow,border-color] duration-[120ms] ease-out focus-visible:border-accent focus-visible:outline-none"
               style={{ borderColor: "rgba(26,26,23,0.10)", fontSize: "16px" }}
               placeholder="Client name"
             />
@@ -1415,7 +1415,7 @@ export function ProposalEditor({ proposalId }: EditorProps) {
         <button
           type="button"
           onClick={() => setLivePreview(true)}
-          className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-medium text-text-secondary transition-colors hover:bg-surface-alt hover:text-text-primary"
+          className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-surface-alt hover:text-text-primary"
         >
           <Eye size={15} strokeWidth={1.75} />
           Preview
@@ -1425,7 +1425,7 @@ export function ProposalEditor({ proposalId }: EditorProps) {
         <button
           type="button"
           onClick={handleDownloadPDF}
-          className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-medium text-text-secondary transition-colors hover:bg-surface-alt hover:text-text-primary"
+          className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-surface-alt hover:text-text-primary"
         >
           <Download size={15} strokeWidth={1.75} />
           PDF
@@ -1435,7 +1435,7 @@ export function ProposalEditor({ proposalId }: EditorProps) {
         <button
           type="button"
           onClick={handleShareLink}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-[13px] font-semibold text-on-accent shadow-sm transition-colors hover:bg-accent-hover"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-on-accent shadow-sm transition-colors hover:bg-accent-hover"
         >
           {copied ? (
             <>
@@ -1456,7 +1456,7 @@ export function ProposalEditor({ proposalId }: EditorProps) {
         <div className="flex flex-1 flex-col overflow-y-auto dot-grid" style={{ minWidth: 0 }}>
           <div
             ref={editorRef}
-            className="mx-auto w-full max-w-[800px] py-8 px-4"
+            className="mx-auto w-full max-w-3xl py-8 px-4"
             style={{ paddingLeft: "56px", paddingRight: "56px" }}
           >
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -1494,10 +1494,10 @@ export function ProposalEditor({ proposalId }: EditorProps) {
           >
             <div className="flex items-center gap-3">
               <Eye size={16} strokeWidth={1.75} className="text-accent" aria-hidden="true" />
-              <span className="font-heading text-[16px] font-semibold text-text-primary select-none">
+              <span className="font-heading text-base font-semibold text-text-primary select-none">
                 Client Preview
               </span>
-              <span className="rounded-full bg-accent-subtle px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent-text select-none">
+              <span className="rounded-full bg-accent-subtle px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-accent-text select-none">
                 {title}
               </span>
             </div>
@@ -1505,7 +1505,7 @@ export function ProposalEditor({ proposalId }: EditorProps) {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[13px] font-medium text-text-secondary transition-colors hover:bg-surface-alt"
+                className="inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-surface-alt"
                 style={{ borderColor: "rgba(26,26,23,0.10)" }}
               >
                 <Download size={14} strokeWidth={2} />
@@ -1514,7 +1514,7 @@ export function ProposalEditor({ proposalId }: EditorProps) {
               <button
                 type="button"
                 onClick={() => setLivePreview(false)}
-                className="inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[13px] font-medium text-text-secondary transition-colors hover:bg-surface-alt"
+                className="inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-surface-alt"
                 style={{ borderColor: "rgba(26,26,23,0.10)" }}
               >
                 <X size={14} strokeWidth={2} />
