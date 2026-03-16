@@ -355,7 +355,8 @@ function TimelineBlock({
   preview?: boolean;
 }) {
   const [activeRow, setActiveRow] = useState<number | null>(null);
-  const [dragMode, setDragMode] = useState<"paint" | "erase" | null>(null);
+  // Drag state: anchor is where mousedown happened, current tracks drag position
+  const [drag, setDrag] = useState<{ row: number; anchor: number; current: number } | null>(null);
   const weeks = Array.from({ length: data.totalWeeks }, (_, i) => i);
 
   const updateTask = (i: number, patch: Partial<TimelineTask>) => {
@@ -374,59 +375,27 @@ function TimelineBlock({
     else if (activeRow !== null && activeRow > i) setActiveRow(activeRow - 1);
   };
 
-  // Click a cell to paint/erase the bar
+  // Simple drag-to-draw: mousedown sets anchor, drag extends range, mouseup commits
   const handleCellMouseDown = (taskIndex: number, weekIndex: number) => {
     if (!editing) return;
-    const task = data.tasks[taskIndex];
-    const end = task.start + task.duration;
-    const isInBar = weekIndex >= task.start && weekIndex < end;
-
-    if (isInBar) {
-      // Erase: shrink from whichever end is closer
-      setDragMode("erase");
-      const distToStart = weekIndex - task.start;
-      const distToEnd = end - 1 - weekIndex;
-      if (distToStart <= distToEnd) {
-        updateTask(taskIndex, { start: weekIndex + 1, duration: Math.max(1, end - weekIndex - 1) });
-      } else {
-        updateTask(taskIndex, { duration: Math.max(1, weekIndex - task.start) });
-      }
-    } else {
-      // Paint: extend bar to include this cell
-      setDragMode("paint");
-      const newStart = Math.min(task.start, weekIndex);
-      const newEnd = Math.max(end, weekIndex + 1);
-      updateTask(taskIndex, { start: newStart, duration: newEnd - newStart });
-    }
+    setDrag({ row: taskIndex, anchor: weekIndex, current: weekIndex });
     setActiveRow(taskIndex);
+    // Immediately set the bar to this single cell
+    updateTask(taskIndex, { start: weekIndex, duration: 1 });
   };
 
   const handleCellMouseEnter = (taskIndex: number, weekIndex: number) => {
-    if (!editing || dragMode === null || taskIndex !== activeRow) return;
-    const task = data.tasks[taskIndex];
-    const end = task.start + task.duration;
-
-    if (dragMode === "paint") {
-      const newStart = Math.min(task.start, weekIndex);
-      const newEnd = Math.max(end, weekIndex + 1);
-      updateTask(taskIndex, { start: newStart, duration: newEnd - newStart });
-    } else {
-      const isInBar = weekIndex >= task.start && weekIndex < end;
-      if (isInBar) {
-        const distToStart = weekIndex - task.start;
-        const distToEnd = end - 1 - weekIndex;
-        if (distToStart <= distToEnd) {
-          updateTask(taskIndex, { start: weekIndex + 1, duration: Math.max(1, end - weekIndex - 1) });
-        } else {
-          updateTask(taskIndex, { duration: Math.max(1, weekIndex - task.start) });
-        }
-      }
-    }
+    if (!editing || !drag || taskIndex !== drag.row) return;
+    // Update range from anchor to current position
+    const start = Math.min(drag.anchor, weekIndex);
+    const end = Math.max(drag.anchor, weekIndex);
+    setDrag({ ...drag, current: weekIndex });
+    updateTask(taskIndex, { start, duration: end - start + 1 });
   };
 
   useEffect(() => {
     if (!editing) return;
-    const handleUp = () => setDragMode(null);
+    const handleUp = () => setDrag(null);
     window.addEventListener("mouseup", handleUp);
     return () => window.removeEventListener("mouseup", handleUp);
   }, [editing]);
@@ -484,7 +453,7 @@ function TimelineBlock({
           style={{ background: "rgba(45,106,79,0.03)", border: "1px dashed rgba(45,106,79,0.15)" }}
         >
           <span className="text-[11px] font-medium text-accent-text select-none">
-            Click & drag on the grid to paint bars. Click filled cells to erase.
+            Click and drag on the grid to set each phase's duration.
           </span>
         </div>
       )}
@@ -535,10 +504,10 @@ function TimelineBlock({
                       return (
                         <div
                           key={w}
-                          className={`flex-1 border-l ${editing ? "cursor-pointer" : ""}`}
+                          className={`flex-1 border-l ${editing ? "cursor-crosshair" : ""}`}
                           style={{
                             borderColor: "rgba(26,26,23,0.06)",
-                            height: "32px",
+                            height: "36px",
                             position: "relative",
                           }}
                           onMouseDown={() => handleCellMouseDown(i, w)}
@@ -546,7 +515,7 @@ function TimelineBlock({
                         >
                           {isInBar && (
                             <div
-                              className="absolute inset-x-0 top-[5px] bottom-[5px] transition-opacity duration-[80ms]"
+                              className="absolute inset-x-0 top-[6px] bottom-[6px] transition-opacity duration-[80ms]"
                               style={{
                                 background: task.color,
                                 opacity: isActive ? 1 : 0.8,
@@ -556,8 +525,8 @@ function TimelineBlock({
                           )}
                           {editing && !isInBar && (
                             <div
-                              className="absolute inset-x-[2px] top-[6px] bottom-[6px] rounded-[3px] opacity-0 transition-opacity duration-[80ms] group-hover/row:opacity-100"
-                              style={{ background: "rgba(45,106,79,0.06)" }}
+                              className="absolute inset-x-[1px] top-[7px] bottom-[7px] rounded-[3px] opacity-0 transition-opacity duration-[80ms] group-hover/row:opacity-100"
+                              style={{ background: "rgba(45,106,79,0.08)" }}
                             />
                           )}
                         </div>
